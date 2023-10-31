@@ -1,15 +1,112 @@
 import boto3
-import face_recognition
+
 import pickle
 import os
-from face_recognition_util import FaceEncodingsLoader
+# from face_recognition_util import FaceEncodingsLoader
 import json
 
-from s3Coms import S3FileManager
+# from s3Coms import S3FileManager
 
 import os
 import logging
 import sys
+
+import face_recognition
+import pickle
+import numpy as np
+
+aws_access_key_id = 'AKIAQKMDBFTEDZAUQCG5'
+aws_secret_access_key = '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'
+aws_region = 'us-east-1' 
+
+
+class S3FileManager:
+    def __init__(self, bucket_name):
+        self.bucket_name = bucket_name
+        self.s3 = boto3.client('s3', region_name=aws_region, 
+                               aws_access_key_id=aws_access_key_id, 
+                               aws_secret_access_key=aws_secret_access_key)
+
+    def upload_image(self, key, image_file):
+        """
+        Upload an image file to S3.
+
+        Args:
+            key (str): The object key (S3 filename).
+            image_file (str): The local path to the image file.
+        """
+        self.s3.upload_file(image_file, self.bucket_name, key)
+
+    def upload_text(self, key, text):
+        """
+        Upload text content to S3.
+
+        Args:
+            key (str): The object key (S3 filename).
+            text (str): The text content to upload.
+        """
+        self.s3.put_object(Bucket=self.bucket_name, Key=key, Body=text)
+
+    def copy_video_to_file(self, key, file_path):
+        """
+        Copy an image from S3 to a local file.
+
+        Args:
+            key (str): The object key (S3 filename).
+            file_path (str): The local path where the image should be copied.
+        """
+        self.s3.download_file(self.bucket_name, key, file_path)
+
+class FaceEncodingsLoader:
+    def __init__(self, encoding_file):
+        self.encodings = self.load_encodings(encoding_file)
+
+    def load_encodings(self, filename):
+        try:
+            with open(filename, "rb") as file:
+                encodings = pickle.load(file)
+            return encodings
+        except Exception as e:
+            raise ValueError(f"Failed to load encodings from {filename}: {str(e)}")
+
+    def get_encodings(self):
+        return self.encodings
+
+    def find_best_match(self, known_encodings, unknown_image_path,names, threshold=0.6):
+        """
+        Compares an unknown face image to a list of known face encodings and returns the best match.
+        
+        :param known_encodings: List of known face encodings (numpy arrays).
+        :param unknown_image_path: Path to the unknown image for comparison.
+        :param threshold: Similarity threshold for considering a match (default is 0.6).
+        :return: Name or identifier of the best match, or None if no match is found.
+        """
+        # Load the unknown image
+        print(unknown_image_path)
+        unknown_image = face_recognition.load_image_file(unknown_image_path)
+
+        # Encode the faces in the unknown image
+        face_locations = face_recognition.face_locations(unknown_image)
+        unknown_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+
+        # unknown_encodings = face_recognition.face_encodings(unknown_image)
+
+        if not unknown_encodings:
+            return None  # No faces found in the unknown image.
+
+        # Compare the unknown face encodings to the list of known encodings
+        matches = face_recognition.compare_faces(known_encodings, unknown_encodings[0], tolerance=threshold)
+
+        face_distances = face_recognition.face_distance(known_encodings, unknown_encodings[0])
+        best_match_index = np.argmin(face_distances)
+        if matches[best_match_index]:
+            name = names[best_match_index]
+            return name
+        else:
+            return "unknown face"
+        
+
+
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -146,33 +243,33 @@ def lambda_handler(event, context):
 		}
 
 
-event = {
-  "Records": [
-    {
-      "eventVersion": "2.1",
-      "eventSource": "aws:s3",
-      "awsRegion": "us-east-1",
-      "eventTime": "1970-01-01T00:00:00.000Z",
-      "eventName": "ObjectCreated:*",
-      "s3": {
-        "s3SchemaVersion": "1.0",
-        "configurationId": "bcca404d-cb99-48f8-a05d-696eacf53c5b",
-        "bucket": {
-          "name": "inputbucket-cloudcomputing2",
-          "ownerIdentity": {
-            "principalId": "022286511304"
-          },
-          "arn": "arn:aws:s3:::inputbucket-cloudcomputing2"
-        },
-        "object": {
-          "key": "test_0.mp4",
-          "size": 322560,
-          "eTag": "0123456789abcdef0123456789abcdef",
-          "sequencer": "0A1B2C3D4E5F678901"
-        }
-      }
-    }
-  ]
-}
+# event = {
+#   "Records": [
+#     {
+#       "eventVersion": "2.1",
+#       "eventSource": "aws:s3",
+#       "awsRegion": "us-east-1",
+#       "eventTime": "1970-01-01T00:00:00.000Z",
+#       "eventName": "ObjectCreated:*",
+#       "s3": {
+#         "s3SchemaVersion": "1.0",
+#         "configurationId": "bcca404d-cb99-48f8-a05d-696eacf53c5b",
+#         "bucket": {
+#           "name": "inputbucket-cloudcomputing2",
+#           "ownerIdentity": {
+#             "principalId": "022286511304"
+#           },
+#           "arn": "arn:aws:s3:::inputbucket-cloudcomputing2"
+#         },
+#         "object": {
+#           "key": "test_0.mp4",
+#           "size": 322560,
+#           "eTag": "0123456789abcdef0123456789abcdef",
+#           "sequencer": "0A1B2C3D4E5F678901"
+#         }
+#       }
+#     }
+#   ]
+# }
 
-lambda_handler(event,"asdasda")
+# lambda_handler(event,"asdasda")

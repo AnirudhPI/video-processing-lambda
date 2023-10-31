@@ -32,6 +32,9 @@ aws ecr create-repository --repository-name test-hello-world --region us-east-1 
 - next tag and push the image
 
 ```bash
+
+docker build --platform linux/amd64 -t test-hello-world:test .
+
 docker tag test-hello-world:test 022286511304.dkr.ecr.us-east-1.amazonaws.com/test-hello-world:latest
 
 # push

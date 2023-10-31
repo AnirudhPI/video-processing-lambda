@@ -69,8 +69,30 @@ RUN apt-get install dos2unix
 RUN dos2unix /entry.sh
 RUN chmod 777 /entry.sh
 
+RUN export PATH="${FUNCTION_DIR}:$PATH"
+
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 # CMD [ "handler.handler" ]
-ENTRYPOINT [ "/entry.sh" ]
-# ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
+ENTRYPOINT [ "bash","/entry.sh" ]
+
 CMD [ "handler.lambda_handler" ]
+
+# COPY lambda_function.py ${FUNCTION_DIR}
+
+
+# CMD [ "lambda_function.handler" ]
+
+# ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
+
+# Copy requirements.txt
+# COPY requirements.txt ${FUNCTION_DIR}
+
+# # Install the specified packages
+# RUN pip install -r requirements.txt
+
+# # Copy function code
+# COPY lambda_function.py ${FUNCTION_DIR}
+
+# # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+# CMD [ "lambda_function.handler" ]
+

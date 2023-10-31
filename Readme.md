@@ -32,10 +32,15 @@ aws ecr create-repository --repository-name video-image-fixed --region us-east-1
 - next tag and push the image
 
 ```bash
-docker tag video-image-fixed:test 022286511304.dkr.ecr.us-east-1.amazonaws.com/video-image-fixed:latest
+docker build -t image5 .
+docker run -p 9000:8080 image5
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d "{"""token""":"""mytoken"""}"
+
+
+docker tag image5 022286511304.dkr.ecr.us-east-1.amazonaws.com/video-processing-image
 
 # push
-docker push 022286511304.dkr.ecr.us-east-1.amazonaws.com/video-image-fixed:latest
+docker push 022286511304.dkr.ecr.us-east-1.amazonaws.com/video-processing-image
 ```
 
 
