@@ -6,6 +6,126 @@ docker run -it --entrypoint bash hybrid-cloud
 
 ```
 
+## Cloning repo in openfaas
+```
+git clone -b hybrid-cloud https://github.com/AnirudhPI/video-processing-lambda.git
+```
+
+
+## Faas cli
+```bash
+faas-cli new --lang dockerfile procvideo
+#get cluster IP
+kubectl get service -n openfaas
+
+# checking the services
+kubectl get deploy -n openfaas
+
+
+
+# faas-cli build -f procvideo
+faas-cli deploy -f procvideo.yml -n openfaas --gateway 10.104.206.67
+faas-cli deploy --image hybrid-cloud:latest --name docker-only-facerecog
+```
+
+- debugging links: 
+1. https://stackoverflow.com/questions/70174034/open-faas-function-will-not-deploy
+2. https://docs.openfaas.com/deployment/troubleshooting/
+
+
+```bash
+#get cluster IP
+kubectl get service -n openfaas
+
+# checking the services
+kubectl get deploy -n openfaas
+
+# checking my image 
+docker run -it --entrypoint bash  hasagar97/hybrid-cloud:latest
+
+# faas-cli build -f procvideo
+faas-cli deploy -f procvideo.yml -n openfaas --gateway 10.104.206.67
+```
+
+
+### trying different ways to launch the openfaas
+
+```bash
+
+# internal gateway
+faas-cli deploy -f facerecog.yml -n openfaas --gateway 10.104.206.67
+
+
+# using image
+faas-cli deploy --image hasagar97/hybrid-cloud:latest --name facerecog-docker --gateway 192.168.49.2
+```
+## Some success
+
+```bash
+export gw=http://$(minikube ip):31112
+faas-cli deploy --image hasagar97/hybrid-cloud:latest --name facerecog-docker --gateway 192.168.49.2:31112
+
+
+# Checking functions that are running
+export gw=http://$(minikube ip):31112
+faas-cli list --gateway $gw
+# check for 0/1 here
+
+
+# checking the logs
+faas-cli logs facerecog-docker --gateway $gw
+
+```
+
+## trying new faas method using yml file
+
+```bash 
+export gw=http://$(minikube ip):31112
+faas-cli deploy -f facerecog.yml --gateway $gw
+
+```
+
+
+#### facrecog.yml
+```yml
+version: 1.0
+provider:
+  name: openfaas
+
+functions:
+  facerecog:
+    image: hasagar97/hybrid-cloud:latest
+    labels:
+      com.openfaas.scale.min: 1
+      com.openfaas.scale.max: 20
+
+```
+
+## testing faas
+
+```python
+import requests
+event = {
+                "Records": [
+                    {
+                        "s3": 
+                        {
+                            "object": {
+                                "key": "test_0.mp4"
+                            }
+                        }
+                    }   
+                ]
+            }
+response = requests.post(url="http://192.168.49.2:31112/function/facerecog-docker", data=event)
+```
+
+
+
+### Deleting functions
+```sh
+faas-cli rm  facerecog-docker --gateway=$gw
+```
 
 
 # How to run
@@ -16,6 +136,8 @@ docker run -it --entrypoint bash hybrid-cloud
 aws configure
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 022286511304.dkr.ecr.us-east-1.amazonaws.com
 python workload.py
+
+
 ```
 
 

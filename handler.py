@@ -47,7 +47,7 @@ def save_frames(video_file_path, folder_name):
 
 
 
-def lambda_handler(event, context):
+def lambda_handler(event):
 	# Get the S3 bucket and object information from the S3 event
 
 	print(event)
@@ -178,4 +178,4 @@ event = {
   ]
 }
 
-# lambda_handler(event,"asdasda")
+lambda_handler(event)
