@@ -29,9 +29,9 @@ output_bucket = "outputbucket-cloudcomputing2"
 s3_input = S3FileManager(input_bucket)
 s3_results = S3FileManager(output_bucket)
 
-aws_access_key_id = 'AKIAQKMDBFTEDZAUQCG5'
-aws_secret_access_key = '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'
-aws_region = 'us-east-1' 
+aws_access_key_id = 'AKIA25MVWGGJN7JUPP5K'
+aws_secret_access_key = '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'
+aws_region = 'us-east-1'  
 
 def save_frames(video_file_path, folder_name):
     # Check if the folder exists, and if not, create it
@@ -49,6 +49,9 @@ def save_frames(video_file_path, folder_name):
 
 def lambda_handler(event, context):
 	# Get the S3 bucket and object information from the S3 event
+
+	print(event)
+
 	logger.info('## Function triggered')
 	s3_event = event['Records'][0]['s3']
 	object_key = s3_event['object']['key']
@@ -175,4 +178,4 @@ event = {
   ]
 }
 
-lambda_handler(event,"asdasda")
+# lambda_handler(event,"asdasda")

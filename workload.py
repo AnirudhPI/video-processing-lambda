@@ -10,11 +10,20 @@ aws_secret_access_key = ''
 aws_region = 'us-east-1' 
 
 
+
+endpoint_url = 'http://54.196.19.249:8000/'
+access_key = 'AKIA25MVWGGJN7JUPP5K'
+secret_key = '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'
+
+
 def clear_input_bucket():
 	global input_bucket
-	s3 = boto3_client('s3', region_name=aws_region, 
-                               aws_access_key_id=aws_access_key_id, 
-                               aws_secret_access_key=aws_secret_access_key)
+	s3 = boto3_client(
+            service_name='s3',
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key
+                )
 	list_obj = s3.list_objects_v2(Bucket=input_bucket)
 	try:
 		for item in list_obj["Contents"]:
@@ -25,7 +34,12 @@ def clear_input_bucket():
 	
 def clear_output_bucket():
 	global output_bucket
-	s3 = boto3_client('s3')
+	s3 = boto3_client(
+            service_name='s3',
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key
+                )
 	list_obj = s3.list_objects_v2(Bucket=output_bucket)
 	try:
 		for item in list_obj["Contents"]:
@@ -36,7 +50,12 @@ def clear_output_bucket():
 
 def upload_to_input_bucket_s3(path, name):
 	global input_bucket
-	s3 = boto3_client('s3')
+	s3 = boto3_client(
+            service_name='s3',
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key
+                )
 	s3.upload_file(path + name, input_bucket, name)
 	
 	
@@ -66,7 +85,7 @@ def workload_generator():
 	upload_files("test_case_2")
 	
 
-# clear_input_bucket()
+clear_input_bucket()
 clear_output_bucket()	
 workload_generator()	
 

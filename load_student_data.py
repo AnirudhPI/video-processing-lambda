@@ -1,8 +1,17 @@
 import boto3
 import json
 
+
+aws_access_key_id = 'AKIA25MVWGGJN7JUPP5K'
+aws_secret_access_key = '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'
+aws_region = 'us-east-1' 
+
+
 # Initialize the DynamoDB client
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.resource('dynamodb', 
+							region_name=aws_region,
+							aws_access_key_id=aws_access_key_id, 
+                            aws_secret_access_key=aws_secret_access_key)
 
 # Specify the table name
 table_name = 'Students'

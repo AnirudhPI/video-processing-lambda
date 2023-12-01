@@ -1,3 +1,13 @@
+# New commands for hybrid cloud
+
+```bash
+docker build -t hybrid-cloud .
+docker run -it --entrypoint bash hybrid-cloud
+
+```
+
+
+
 # How to run
 
 - make sure you have the test cases folder copied in this folder
