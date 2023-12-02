@@ -1,3 +1,6 @@
+
+import cv2
+import os
 import boto3
 import face_recognition
 import pickle
@@ -162,17 +165,28 @@ s3_results = S3FileManager(output_bucket)
 
 
 
+
 def save_frames(video_file_path, folder_name):
-    # Check if the folder exists, and if not, create it
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
 
-    # Generate the output image file names
-    output_pattern = os.path.join(folder_name, "image-%3d.jpeg")
+    cap = cv2.VideoCapture(video_file_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_count = 0
 
-    # Use subprocess to run the ffmpeg command
-    cmd = f"ffmpeg -i {video_file_path} -r 1 {output_pattern}"
-    os.system(cmd)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        output_path = os.path.join(folder_name, f"image-{frame_count:03d}.jpeg")
+        cv2.imwrite(output_path, frame)
+
+        frame_count += 1
+
+    cap.release()
+    print(f"Total frames saved: {frame_count}")
+
 
 def handle(event):
 	print("using lamba_handler")
