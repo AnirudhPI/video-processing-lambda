@@ -66,7 +66,7 @@ class FaceEncodingsLoader:
         :return: Name or identifier of the best match, or None if no match is found.
         """
         # Load the unknown image
-        print(unknown_image_path)
+        #print((unknown_image_path)
         unknown_image = face_recognition.load_image_file(unknown_image_path)
 
         # Encode the faces in the unknown image
@@ -145,16 +145,16 @@ class S3FileManager:
         return self.s3.list_objects(Bucket=self.bucket_name)
     
     def read_s3_object(self, object_key):
-        print(f"retrieving {object_key} from {bucket_name}")
+        #print((f"retrieving {object_key} from {bucket_name}")
         try:
             # Get the object from S3
             response = self.s3.get_object(Bucket=self.bucket_name, Key=object_key)
 
             content = response['Body'].read().decode('utf-8')
-            print(content)
+            #print((content)
 
         except Exception as e:
-            print(f"Error reading S3 object: {e}")
+            #print((f"Error reading S3 object: {e}")
 
 
 s3_input = S3FileManager(input_bucket)
@@ -175,13 +175,13 @@ def save_frames(video_file_path, folder_name):
     os.system(cmd)
 
 def handle(event):
-	print("using lamba_handler")
+	#print(("using lamba_handler")
 	return lambda_handler(event)
 
 def lambda_handler(event):
 	# Get the S3 bucket and object information from the S3 event
 
-	print(event)
+	#print((event)
 
 	logger.info('## Function triggered')
 	s3_event = event['Records'][0]['s3']
@@ -220,7 +220,7 @@ def lambda_handler(event):
 		if os.path.isfile(file_path):
 			logger.info(f"Processing file: {file_path}")
 
-			# print(f"Processing file: {file_path}")
+			# #print((f"Processing file: {file_path}")
 
 		results  = encodings_loader.find_best_match(loaded_encodings["encoding"],file_path,loaded_encodings["name"])
 		if results !=  "unknown face":
@@ -256,7 +256,7 @@ def lambda_handler(event):
 	s3_results.upload_text(object_key.split(".")[0],final_string)
 
 
-	print(results)
+	#print((results)
 
 
 
@@ -309,4 +309,4 @@ event = {
   ]
 }
 
-handle(event)
+# handle(event)

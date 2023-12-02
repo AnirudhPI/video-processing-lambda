@@ -62,6 +62,7 @@ COPY entry.sh /
 
 # Copy function code
 COPY handler.py ${FUNCTION_DIR}
+COPY test_monitor.py ${FUNCTION_DIR}
 COPY face_recognition_util.py ${FUNCTION_DIR}
 COPY s3Coms.py ${FUNCTION_DIR}
 COPY encoding ${FUNCTION_DIR}

@@ -104,11 +104,14 @@ if __name__ == "__main__":
                     }   
                 ]
             }
-            response = requests.post(url="http://192.168.49.2:31112/function/facerecog-docker", data=event)
-            if response.status_code == 200:
-                print(response.json())  # Assuming the API returns a list of filenames
-            else:
-                raise Exception("url failed")
+
+            lambda_handler(event)
+
+            # response = requests.post(url="http://192.168.49.2:31112/function/facerecog-docker", data=event)
+            # if response.status_code == 200:
+            #     print(response.json())  # Assuming the API returns a list of filenames
+            # else:
+            #     raise Exception("url failed")
         #lambda_handler(event=event, context='aaa')
             
         time.sleep(2)
