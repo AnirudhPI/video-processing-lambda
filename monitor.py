@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
             # lambda_handler(event)
 
-            response = requests.post(url="http://192.168.49.2:31112/function/facerecog-docker", data=event)
+            response = requests.post(url="http://192.168.49.2:31112/function/facerecog", data=event)
             if response.status_code == 200:
                 print(response.json())  # Assuming the API returns a list of filenames
             else:
