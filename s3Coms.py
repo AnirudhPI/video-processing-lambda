@@ -92,5 +92,5 @@ if __name__ == "__main__":
 
 
     s3_output = S3FileManager("outputbucket-cloudcomputing2")
-    s3_output.read_s3_object("test_34")
+    s3_output.read_s3_object("test_0")
 

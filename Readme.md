@@ -2,8 +2,9 @@
 
 ```bash
 docker build -t hybrid-cloud .
+docker tag hybrid-cloud:latest hasagar97/hybrid-cloud:latest
+docker push hasagar97/hybrid-cloud:latest
 docker run -it --entrypoint bash hybrid-cloud
-
 ```
 
 ## Cloning repo in openfaas
@@ -70,10 +71,12 @@ faas-cli deploy --image hasagar97/hybrid-cloud:latest --name facerecog-docker --
 export gw=http://$(minikube ip):31112
 faas-cli list --gateway $gw
 # check for 0/1 here
+kubectl get deploy -n openfaas-fn
+
 
 
 # checking the logs
-faas-cli logs facerecog-docker --gateway $gw
+faas-cli logs hybrid-cloud --gateway $gw
 
 ```
 
@@ -82,6 +85,7 @@ faas-cli logs facerecog-docker --gateway $gw
 ```bash 
 export gw=http://$(minikube ip):31112
 faas-cli deploy -f facerecog.yml --gateway $gw
+
 
 ```
 
@@ -117,15 +121,44 @@ event = {
                     }   
                 ]
             }
-response = requests.post(url="http://192.168.49.2:31112/function/facerecog-docker", data=event)
+response = requests.post(url="http://192.168.49.2:31112/function/hybrid-cloud", data=event)
+
 ```
 
+```bash
+faas-cli list --gateway $gw
+echo '{"Records":[{"s3":{"object":{"key":"test_0.mp4"}}}]}' | faas-cli invoke hybrid-cloud --gateway $gw
+
+```
+
+
+### Attemp 5 using new link
+- link: https://github.com/openfaas/faas-cli/issues/603
+
+```bash
+export gw=http://$(minikube ip):31112
+
+faas new --lang=dockerfile --prefix=hasagar97 hybrid-cloud --gateway=$gw
+faas-cli deploy --image hasagar97/hybrid-cloud:latest --name hybrid-cloud --gateway $gw
+
+
+
+faas-cli deploy -f hybrid-cloud.yml --gateway $gw
+faas-cli invoke hybrid-cloud --gateway $gw
+```
 
 
 ### Deleting functions
 ```sh
 faas-cli rm  facerecog-docker --gateway=$gw
+faas-cli rm  hybrid-cloud --gateway=$gw
+
 ```
+
+
+#### Scaling
+
+https://www.openfaas.com/blog/health-and-readiness-for-functions/
 
 
 # How to run
